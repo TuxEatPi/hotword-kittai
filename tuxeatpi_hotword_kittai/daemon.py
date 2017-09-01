@@ -115,7 +115,6 @@ class HotWord(TepBaseDaemon):
                 self.detector.start(detected_callback=self._wake_up,
                                     sleep_time=0.03)
             except Exception as exp:  # pylint: disable=W0703
-                adgadsg  # pylint: disable=W0104,E0602
                 self.logger.error(exp)
                 time.sleep(5)
         else:
