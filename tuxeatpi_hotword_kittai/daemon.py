@@ -59,6 +59,8 @@ class HotWord(TepBaseDaemon):
             data = {"arguments": {"context_tag": "general"}}
             message = Message(topic="nlu/audio", data=data, context="general")
             self.publish(message)
+        else:
+            self.logger.debug("HotWord detected but hotword disabled")
 
     def set_config(self, config):
         """Save the configuration and reload the daemon"""
