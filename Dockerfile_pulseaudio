@@ -1,6 +1,9 @@
 FROM python:3.6-stretch
 
-RUN apt-get update && apt-get install -y git gcc python3-dev musl-dev portaudio19-dev make swig g++ libatlas-base-dev
+RUN apt-get update && apt-get install -y git gcc python3-dev musl-dev portaudio19-dev make swig g++ libatlas-base-dev pulseaudio-utils pulseaudio && apt-get clean
+# Configure pulseaudio
+RUN echo enable-shm=no >> /etc/pulse/client.conf
+ENV PULSE_SERVER /run/pulse/native
 
 COPY requirements.txt /opt/requirements.txt
 COPY test_requirements.txt /opt/test_requirements.txt
@@ -22,4 +25,7 @@ WORKDIR /workdir
 COPY dialogs /dialogs
 COPY intents /intents
 
-ENTRYPOINT ["tep-hotword-kittai", "-w", "/workdir", "-I", "/intents", "-D", "/dialogs"]
+COPY misc/docker-pulseaudio-entrypoint.sh /docker-entrypoint.sh
+
+ENTRYPOINT ["/docker-entrypoint.sh"]
+CMD ["tep"]

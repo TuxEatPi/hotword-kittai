@@ -80,6 +80,7 @@ jobs:
       - run:
           name: Push to Docker Hub
           command: |
-            docker build -t tuxeatpi/hotword-kittai:latest -f Dockerfile .
+            #docker build -t tuxeatpi/hotword-kittai:latest -f Dockerfile .
+            docker build -t tuxeatpi/hotword-kittai:latest -f Dockerfile_pulseaudio .
             docker login -u $DOCKERHUB_USER -p $DOCKERHUB_PASSWORD
             docker push tuxeatpi/hotword-kittai:latest

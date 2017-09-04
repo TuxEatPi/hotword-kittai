@@ -1,5 +1,6 @@
 """Module defining Hotword component based on Snowboy"""
 import logging
+import os
 import time
 import wave
 
@@ -69,14 +70,25 @@ class HotWord(TepBaseDaemon):
             if attr not in config.keys():
                 self.logger.error("Missing parameter {}".format(attr))
                 return False
+        # Check params
+        if not os.path.isfile(config.get("sound_file", "")):
+            self.logger.error("Bad sound file: %s", config.get("sound_file"))
+            return False
+        if not os.path.isfile(config.get("model_file", "")):
+            self.logger.error("Bad model file: %s", config.get("model_file"))
+            return False
         # Set params
-        self._model_file = config.get('model_file')
         self._answer_sound_path = config.get("sound_file")
-        if self.sensitivity != config.get("sensitivity"):
+        if self._model_file != config.get('model_file') or \
+                self.sensitivity != config.get("sensitivity"):
+            self._model_file = config.get('model_file')
             self.sensitivity = float(config.get("sensitivity"))
             if self.detector is not None:
+                self.logger.info("Stopping hotword detector")
                 self.detector.terminate()
+                self.detector = None
             # Create a new detector
+            self.logger.info("Initializing hotword detector")
             self.detector = snowboydecoder.HotwordDetector(self._model_file,
                                                            self.logger,
                                                            sensitivity=self.sensitivity)

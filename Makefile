@@ -2,7 +2,7 @@
 ### Dev targets
 #######################################
 dev-dep:
-	sudo apt-get install python3-virtualenv python3-pil.imagetk python3-tk libspeex-dev swig libpulse-dev libspeexdsp-dev portaudio19-dev
+	sudo apt-get install python3-virtualenv  musl-dev portaudio19-dev make swig g++
 
 dev-build-snowboy:
 	git clone https://github.com/Kitt-AI/snowboy.git || true
@@ -17,6 +17,22 @@ dev-pyenv:
 	virtualenv -p /usr/bin/python3 env
 	env/bin/pip3 install -r requirements.txt --upgrade --force-reinstall
 	env/bin/python setup.py develop
+
+#######################################
+### Docker
+#######################################
+
+docker_build:
+	docker build -t hotword_kittai -f Dockerfile_pulseaudio .
+
+docker_run:
+	docker run --rm --net=host \
+    -e TEP_ETCD_HOST=127.0.0.1 \
+    -e TEP_MQTT_HOST=127.0.0.1 \
+    -v `pwd`/Coco.pmdl:/Coco.pmdl \
+    -v `pwd`/sounds/answer.wav:/hotword_answer.wav \
+    -v /run/user/`id -u`/pulse:/run/pulse:ro \
+    hotword_kittai tep
 
 #######################################
 ### Documentation
