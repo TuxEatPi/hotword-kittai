@@ -1,8 +1,9 @@
+"""SnowBoy hotword detector"""
 import collections
-import pyaudio
-import time
-import wave
 import os
+import time
+
+import pyaudio
 
 from tuxeatpi_hotword_kittai.libs import snowboydetect
 
@@ -44,14 +45,16 @@ class HotwordDetector(object):
 
     def __init__(self, decoder_model, logger,
                  resource=RESOURCE_FILE,
-                 sensitivity=[],
+                 sensitivity=None,
                  audio_gain=1):
+        if sensitivity is None:
+            sensitivity = []
         self.logger = logger.getChild('snowboy')
-        tm = type(decoder_model)
-        ts = type(sensitivity)
-        if tm is not list:
+        model_type = type(decoder_model)
+        sensitivity_type = type(sensitivity)
+        if model_type is not list:
             decoder_model = [decoder_model]
-        if ts is not list:
+        if sensitivity_type is not list:
             sensitivity = [sensitivity]
         model_str = ",".join(decoder_model)
 
@@ -62,12 +65,12 @@ class HotwordDetector(object):
 
         if len(decoder_model) > 1 and len(sensitivity) == 1:
             sensitivity = sensitivity * self.num_hotwords
-        if len(sensitivity) != 0:
+        if sensitivity:
             assert self.num_hotwords == len(sensitivity), \
                 "number of hotwords in decoder_model (%d) and sensitivity " \
                 "(%d) does not match" % (self.num_hotwords, len(sensitivity))
         sensitivity_str = ",".join([str(t) for t in sensitivity])
-        if len(sensitivity) != 0:
+        if sensitivity:
             self.detector.SetSensitivity(sensitivity_str.encode())
 
         self.ring_buffer = RingBuffer(
@@ -94,7 +97,8 @@ class HotwordDetector(object):
         """
         self._running = True
 
-        def audio_callback(in_data, frame_count, time_info, status):
+        def audio_callback(in_data, frame_count, time_info, status):  # pylint: disable=W0613
+            """Audio callback when hotword detected"""
             self.ring_buffer.extend(in_data)
             play_data = chr(0) * len(in_data)
             return play_data, pyaudio.paContinue
@@ -113,8 +117,8 @@ class HotwordDetector(object):
             self.logger.debug("detect voice return")
             return
 
-        tc = type(detected_callback)
-        if tc is not list:
+        callback_type = type(detected_callback)
+        if callback_type is not list:
             detected_callback = [detected_callback]
         if len(detected_callback) == 1 and self.num_hotwords > 1:
             detected_callback *= self.num_hotwords
@@ -130,7 +134,7 @@ class HotwordDetector(object):
                 self.logger.debug("detect voice break")
                 break
             data = self.ring_buffer.get()
-            if len(data) == 0:
+            if not data:
                 time.sleep(sleep_time)
                 continue
 

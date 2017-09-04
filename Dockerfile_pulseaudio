@@ -6,11 +6,11 @@ RUN mkdir -p /workdir /opt/tuxeatpi_hotword_kittai/libs
 
 COPY Makefile /opt/Makefile
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends git gcc python3-dev libportaudio2 musl-dev portaudio19-dev make swig g++ libatlas-base-dev pulseaudio-utils pulseaudio && \
+    apt-get install -y --no-install-recommends git gcc python3 libpython3.5 libatlas3-base libportaudio2 swig pulseaudio-utils pulseaudio make g++ python3-dev musl-dev portaudio19-dev swig libatlas-base-dev pulseaudio-utils pulseaudio && \
     apt-get clean && \
     pip install -r /opt/requirements.txt && \
     cd /opt && make dev-build-snowboy && cd / && \
-    apt-get -y purge python3-dev musl-dev portaudio19-dev libatlas-base-dev && apt -y autoremove --purge && \
+    apt-get -y purge python3-dev musl-dev portaudio19-dev libatlas-base-dev g++ make && apt -y autoremove --purge && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 # Configure pulseaudio
 RUN echo enable-shm=no >> /etc/pulse/client.conf
