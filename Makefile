@@ -23,7 +23,7 @@ dev-pyenv:
 #######################################
 
 docker_build:
-	docker build -t hotword_kittai -f Dockerfile_pulseaudio .
+	docker build -t hotword_kittai -f Dockerfile .
 
 docker_run:
 	docker run --rm --net=host \

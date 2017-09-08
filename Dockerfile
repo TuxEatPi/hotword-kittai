@@ -1,25 +1,25 @@
-FROM python:3.6-stretch
-
-RUN apt-get update && apt-get install -y git gcc python3-dev musl-dev portaudio19-dev make swig g++ libatlas-base-dev
-
-COPY requirements.txt /opt/requirements.txt
-COPY test_requirements.txt /opt/test_requirements.txt
-RUN pip install -r /opt/requirements.txt
-
-RUN mkdir /workdir
-
-WORKDIR /opt
-COPY Makefile /opt/Makefile
-RUN mkdir -p /opt/tuxeatpi_hotword_kittai/libs
-RUN make dev-build-snowboy
-
-COPY setup.py /opt/setup.py
-COPY tuxeatpi_hotword_kittai /opt/tuxeatpi_hotword_kittai
-RUN python setup.py install
-
-WORKDIR /workdir
+FROM tuxeatpi/pulseaudio
 
 COPY dialogs /dialogs
 COPY intents /intents
 
-ENTRYPOINT ["tep-hotword-kittai", "-w", "/workdir", "-I", "/intents", "-D", "/dialogs"]
+COPY test_requirements.txt /opt/test_requirements.txt
+COPY requirements.txt /opt/requirements.txt
+
+COPY Makefile /opt/Makefile
+RUN mkdir -p /workdir /opt/tuxeatpi_hotword_kittai/libs && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends libatlas3-base libportaudio2 swig g++ portaudio19-dev libatlas-base-dev && \
+    apt-get clean && \
+    sed -i 's/.*python-aio-etcd.*//' /opt/requirements.txt && \
+    sed -i 's/.*tuxeatpi-common.*//' /opt/requirements.txt && \
+    pip install -r /opt/requirements.txt && \
+    cd /opt && make dev-build-snowboy  && \
+    apt-get -y purge g++ portaudio19-dev libatlas-base-dev && apt -y autoremove --purge && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /opt/Makefile
+
+COPY setup.py /opt/setup.py
+COPY tuxeatpi_hotword_kittai /opt/tuxeatpi_hotword_kittai
+RUN cd /opt && python setup.py install
+
+CMD ["hotword-kittai"]
