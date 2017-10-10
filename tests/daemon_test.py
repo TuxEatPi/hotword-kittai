@@ -7,7 +7,7 @@ import pytest
 
 from tuxeatpi_hotword_kittai.daemon import HotWord
 from tuxeatpi_hotword_kittai.daemon import HotWordError
-from tuxeatpi_common.message import is_mqtt_topic, Message, MqttClient
+from tuxeatpi_common.message import Message
 
 
 class TestBrain(object):

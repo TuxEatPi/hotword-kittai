@@ -57,7 +57,7 @@ test-syntax:
 
 test-pytest:
 	rm -rf .coverage nosetest.xml nosetests.html htmlcov
-	env/bin/pytest --html=pytest/report.html --self-contained-html --junit-xml=pytest/junit.xml --cov=tuxeatpi_hotword_kittai/ --cov-report=term --cov-report=html:pytest/coverage/html --cov-report=xml:pytest/coverage/coverage.xml tests 
+	env/bin/pytest --html=pytest/report.html --self-contained-html --junit-xml=pytest/junit.xml --cov=tuxeatpi_hotword_kittai/ --cov-report=term --cov-report=html:pytest/coverage/html --cov-report=xml:pytest/coverage/coverage.xml -p no:pytest_wampy tests 
 	coverage combine || true
 	coverage report --include='*/tuxeatpi_hotword_kittai/*'
 	# CODECLIMATE_REPO_TOKEN=${CODECLIMATE_REPO_TOKEN} codeclimate-test-reporter

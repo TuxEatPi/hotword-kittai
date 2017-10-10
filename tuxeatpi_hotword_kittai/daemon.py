@@ -6,7 +6,8 @@ import wave
 
 from tuxeatpi_common.daemon import TepBaseDaemon
 from tuxeatpi_common.error import TuxEatPiError
-from tuxeatpi_common.message import Message, is_mqtt_topic
+from tuxeatpi_common.message import Message
+from tuxeatpi_common.wamp import is_wamp_topic, is_wamp_rpc
 
 from tuxeatpi_hotword_kittai.libs import snowboydecoder
 
@@ -95,28 +96,32 @@ class HotWord(TepBaseDaemon):
 
         return True
 
-    @is_mqtt_topic("help")
+    @is_wamp_rpc("help")
+    @is_wamp_topic("help")
     def help_(self):
         pass
 
-    @is_mqtt_topic("shutdown")
+    @is_wamp_topic("shutdown")
     def shutdown(self):
         if hasattr(self.detector, 'terminate'):
             self.detector.terminate()
             self.detector = None
         super(HotWord, self).shutdown()
 
-    @is_mqtt_topic("reload")
+    @is_wamp_rpc("reload")
+    @is_wamp_topic("reload")
     def reload(self):
         pass
 
-    @is_mqtt_topic("disable")
+    @is_wamp_rpc("disable")
+    @is_wamp_topic("disable")
     def disable(self):
         """Disable hotword listening"""
         self.logger.info("Disabling listening for hotword")
         self.disabled = True
 
-    @is_mqtt_topic("enable")
+    @is_wamp_rpc("enable")
+    @is_wamp_topic("enable")
     def enable(self):
         """Enable hotword listening"""
         self.logger.info("Enabling listening for hotword")
