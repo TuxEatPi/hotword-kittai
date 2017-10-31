@@ -59,7 +59,7 @@ class HotWord(TepBaseDaemon):
             self._answering()
             # create tranmission for audio nlu
             data = {"arguments": {"context_tag": "general"}}
-            message = Message(topic="nlu/audio", data=data, context="general")
+            message = Message(topic="nlu.audio", data=data, context="general")
             self.publish(message)
         else:
             self.logger.debug("HotWord detected but hotword disabled")
